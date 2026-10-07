@@ -53,15 +53,3 @@ Friday, October 16, 2026.
 1. Structured, commented notebook that runs end to end.
 2. Presentation of the approach, architectures, experiments and results.
 3. Demo of the final model.
-
-## Grading
-
-| Criterion | Parts | Points |
-|---|:-:|:-:|
-| Data and preparation | 1 | 3 |
-| Baseline model + CNN | 2–3 | 5 |
-| Training and evaluation | 4–5 | 3 |
-| Experiments and critical analysis | 6 | 4 |
-| Enrichment (improvements and extensions) | 7–9 | 2 |
-| Defense, demo and mastery of the work | Defense | 3 |
-| **Total** | | **20** |
