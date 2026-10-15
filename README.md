@@ -12,7 +12,7 @@ Build a computer vision system that recognizes traffic sign categories, starting
 | <img src="https://github.com/ArnoGrl.png?size=80" width="80" alt="ArnoGrl"> | Arno | [![GitHub](https://img.shields.io/badge/GitHub-ArnoGrl-181717?logo=github&logoColor=white)](https://github.com/ArnoGrl) |
 | <img src="https://github.com/Clemino.png?size=80" width="80" alt="Clemino"> | Clément | [![GitHub](https://img.shields.io/badge/GitHub-Clemino-181717?logo=github&logoColor=white)](https://github.com/Clemino) |
 
-Group of 3: parts 1 to 6 are required, plus at least one substantial extension (e.g. traffic sign detection with YOLO, part 8).
+Group of 3: parts 1 to 6 are required. Our extension is traffic sign detection with YOLO (part 8), followed by classification with our CNN.
 
 ## Stack
 
@@ -35,7 +35,7 @@ Friday, October 16, 2026.
 | 5 | Evaluation and error analysis | Required |
 | 6 | Experiments and improvements (≥ 3 experiments) | Required |
 | 7 | Enrichment with new course concepts | Extension |
-| 8 | Traffic sign detection in a scene (YOLO) | Extension |
+| 8 | Traffic sign detection in a scene (YOLO) | Required for our project |
 | 9 | Video extension | Extension |
 
 1. **Data** — Choose a public traffic sign dataset (e.g. GTSRB, 43 classes) and describe its source, license, size, classes, images per class, image size and format, and class imbalance, with sample images. Resize, normalize, encode labels and split into train / validation / test (test set used only for the final evaluation).
@@ -56,7 +56,7 @@ Friday, October 16, 2026.
 
 ## Notebook
 
-[panneaux_signalisation.ipynb](panneaux_signalisation.ipynb) contient la préparation des données GTSRB, un réseau dense, un CNN à deux blocs, les courbes d'apprentissage et une analyse des erreurs sur la **validation**.
+[panneaux_signalisation.ipynb](panneaux_signalisation.ipynb) contient la préparation des données GTSRB, un réseau dense, un CNN à deux blocs, puis la détection des panneaux avec YOLO et leur classification par le CNN. Les courbes et les erreurs sont analysées sur la **validation**.
 
 Les deux modèles sont essayés pendant 3 époques avec les mêmes données. On conserve le code, les réglages, les sorties et l'explication de chaque essai, y compris s'il est moins bon. Le test officiel est réservé à l'évaluation finale.
 
@@ -69,12 +69,26 @@ Résultats du 15 octobre 2026, sur 31 350 images d'entraînement et 7 859 images
 
 Les courbes et l'analyse des erreurs sont dans le notebook. Ces scores sont calculés sur la validation.
 
+### Premiers essais YOLO
+
+YOLO11n apprend à localiser une seule classe, « panneau », sur GTSDB : 480 scènes pour l'entraînement, 120 pour la validation. Le CNN reconnaît ensuite la catégorie de chaque zone extraite.
+
+| Essai | Résultat |
+|---|---|
+| YOLO pré-entraîné sur COCO, sans adaptation | Sur les six scènes affichées : une détection, un Sens interdit annoncé comme Stop |
+| YOLO adapté pendant 5 époques, images de 640 pixels | mAP50 : 0,843 ; mAP50-95 : 0,637 |
+| YOLO + CNN sur les 120 scènes de validation | 75 panneaux retrouvés sur 98, dont 71 bien classés ; 23 panneaux manqués et 11 fausses détections |
+
+La chaîne utilise un seuil de détection de 0,25. Une détection correspond à une annotation si leur IoU atteint 0,5. Les petits panneaux restent difficiles à repérer. Les jeux de test officiels n'ont pas encore été utilisés.
+
+Les résultats par époque sont dans [yolo_5epoques.csv](resultats/yolo_5epoques.csv), et les comptes par scène dans [yolo_validation.csv](resultats/yolo_validation.csv). Les poids entraînés sont sauvegardés localement dans `models/`.
+
 ### Ce qui reste à faire
 
 - Compléter au moins trois expériences sur le CNN, en gardant chaque tentative et son interprétation.
 - Choisir le modèle sur la validation, puis évaluer une fois le modèle retenu sur le test officiel.
 - Vérifier et documenter les conditions d'utilisation du dataset.
-- Ajouter la détection de panneaux avec YOLO, puis la classification des zones extraites.
+- Comparer les améliorations de YOLO, notamment la durée d'entraînement et la taille des images, puis effectuer son évaluation finale.
 - Finaliser la synthèse et la démonstration dans le notebook.
 
 La vidéo pourra être testée après la détection sur image.

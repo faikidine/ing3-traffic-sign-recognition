@@ -5,3 +5,4 @@ matplotlib==3.11.2
 pillow==12.3.0
 scikit-learn==1.9.1
 ipykernel>=6,<8
+ultralytics==8.4.177
