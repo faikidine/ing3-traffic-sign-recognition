@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Détection de panneaux</title>
+  <link rel="stylesheet" href="/web/style.css">
+  <script src="/web/lecteur.js" defer></script>
+</head>
+<body>
+  <header><h1>Détection de panneaux</h1><span id="etat" role="status">Chargement des modèles…</span></header>
+  <div class="sources">
+    <select id="source" aria-label="Vidéo disponible"><option value="">Choisir une vidéo</option></select>
+    <label class="bouton importer">Ouvrir une vidéo<input id="fichier" type="file" accept="video/*,.mp4,.mov,.m4v,.webm" aria-label="Ouvrir une vidéo"></label>
+    <button id="reglages" aria-expanded="false">Réglages</button>
+  </div>
+  <div id="options" hidden>
+    <label>Seuil YOLO <input id="seuil" type="range" min="0.05" max="0.95" step="0.05" value="0.25"><output id="valeur">0.25</output></label>
+    <label>Taille YOLO <select id="taille"><option>320</option><option selected>640</option><option>960</option></select></label>
+    <label><input id="boucle" type="checkbox"> Rejouer</label>
+  </div>
+  <main>
+    <section class="lecteur">
+      <div id="scene">
+        <video id="video" controls playsinline preload="metadata" controlslist="nofullscreen noremoteplayback" disablepictureinpicture aria-label="Vidéo avec détections"></video>
+        <canvas id="boites" aria-label="Rectangles des panneaux détectés"></canvas>
+        <p id="attente">Ouvrir une vidéo pour commencer.</p>
+      </div>
+      <div class="commandes">
+        <button id="lire" disabled>Lire</button>
+        <button id="reculer" disabled>−5 s</button>
+        <button id="avancer" disabled>+5 s</button>
+        <button id="debut" disabled>Début</button>
+        <span id="temps">0:00 / 0:00</span>
+        <button id="plein-ecran" disabled>Plein écran</button>
+      </div>
+      <p id="erreur" role="alert" hidden></p>
+    </section>
+    <aside>
+      <div class="onglets" role="tablist" aria-label="Détections">
+        <button id="actuel" role="tab" aria-selected="true" aria-controls="resultats">Résultats</button>
+        <button id="historique" role="tab" aria-selected="false" aria-controls="resultats">Historique</button>
+      </div>
+      <p id="mesures">En attente d’analyse.</p>
+      <div id="resultats" role="tabpanel" aria-label="Résultats"><p>Aucun panneau détecté.</p></div>
+      <section id="graphe" hidden aria-label="Évolution des détections">
+        <h2>Panneaux par analyse</h2>
+        <svg viewBox="0 0 320 76" role="img" aria-label="Nombre de panneaux détectés au fil de la lecture">
+          <path d="M24 8 V56 H310" fill="none" stroke="#ccd1d5"/>
+          <text id="maximum" x="4" y="14">1</text><text x="4" y="59">0</text>
+          <polyline id="courbe" fill="none" stroke="#456a83" stroke-width="2"/>
+          <text id="temps-debut" x="24" y="73"></text>
+          <text id="temps-fin" x="310" y="73" text-anchor="end"></text>
+        </svg>
+      </section>
+      <section id="apercus" hidden aria-label="Derniers panneaux repérés">
+        <h2>Derniers panneaux repérés</h2>
+        <div id="vignettes"></div>
+      </section>
+      <p class="note">YOLO : détection · CNN : catégorie<br>Une catégorie peut être incorrecte, même avec un score élevé.</p>
+    </aside>
+  </main>
+</body>
+</html>

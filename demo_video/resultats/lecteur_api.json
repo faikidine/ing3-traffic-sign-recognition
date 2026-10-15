@@ -1,0 +1,91 @@
+{
+  "acces_partiel_video": "OK",
+  "inference_reelle": "OK",
+  "boites_normalisees": "OK",
+  "retour_sur_une_image": "OK",
+  "mediane_aller_retour_ms": 23.5,
+  "essais": [
+    {
+      "seconde": 9.5,
+      "aller_retour_ms": 29.1,
+      "detections": [
+        {
+          "boite": [
+            0.38890197277069094,
+            0.14872603553803368,
+            0.4129939079284668,
+            0.18352687506028165
+          ],
+          "classe": 25,
+          "nom": "Travaux",
+          "yolo": 0.3260975480079651,
+          "cnn": 0.5663824081420898
+        }
+      ],
+      "calcul_ms": 27.1
+    },
+    {
+      "seconde": 9.8,
+      "aller_retour_ms": 21.5,
+      "detections": [
+        {
+          "boite": [
+            0.4022390365600586,
+            0.1561507236810378,
+            0.428083610534668,
+            0.1929309986255787
+          ],
+          "classe": 25,
+          "nom": "Travaux",
+          "yolo": 0.4224255383014679,
+          "cnn": 0.7115730047225952
+        }
+      ],
+      "calcul_ms": 19.6
+    },
+    {
+      "seconde": 10.0,
+      "aller_retour_ms": 25.3,
+      "detections": [
+        {
+          "boite": [
+            0.41426963806152345,
+            0.15523340672622493,
+            0.44518795013427737,
+            0.1952211670424222
+          ],
+          "classe": 21,
+          "nom": "Double virage",
+          "yolo": 0.32055380940437317,
+          "cnn": 0.9607617855072021
+        }
+      ],
+      "calcul_ms": 23.2
+    },
+    {
+      "seconde": 0.0,
+      "aller_retour_ms": 16.4,
+      "detections": [],
+      "calcul_ms": 14.7
+    },
+    {
+      "seconde": 9.5,
+      "aller_retour_ms": 23.5,
+      "detections": [
+        {
+          "boite": [
+            0.38890197277069094,
+            0.14872603553803368,
+            0.4129939079284668,
+            0.18352687506028165
+          ],
+          "classe": 25,
+          "nom": "Travaux",
+          "yolo": 0.3260975480079651,
+          "cnn": 0.5663824081420898
+        }
+      ],
+      "calcul_ms": 21.6
+    }
+  ]
+}

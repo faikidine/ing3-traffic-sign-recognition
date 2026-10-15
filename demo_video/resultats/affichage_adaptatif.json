@@ -1,0 +1,29 @@
+[
+  {
+    "contenu": 600,
+    "hauteur": 600,
+    "largeur": 640,
+    "page": 600
+  },
+  {
+    "contenu": 589,
+    "hauteur": 600,
+    "largeur": 640,
+    "onglet": "Historique",
+    "page": 589
+  },
+  {
+    "contenu": 600,
+    "hauteur": 600,
+    "largeur": 1024,
+    "onglet": "Historique",
+    "page": 600
+  },
+  {
+    "contenu": 600,
+    "hauteur": 600,
+    "largeur": 640,
+    "onglet": "Résultats",
+    "page": 600
+  }
+]

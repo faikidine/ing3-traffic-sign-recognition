@@ -91,4 +91,6 @@ Les résultats par époque sont dans [yolo_5epoques.csv](resultats/yolo_5epoques
 - Comparer les améliorations de YOLO, notamment la durée d'entraînement et la taille des images, puis effectuer son évaluation finale.
 - Finaliser la synthèse et la démonstration dans le notebook.
 
-La vidéo pourra être testée après la détection sur image.
+### Démo vidéo
+
+[demo_video/](demo_video/README.md) reprend les mêmes poids YOLO et CNN dans un lecteur vidéo avec pause, déplacements, rectangles, scores, courbe des détections et aperçus des panneaux. La lecture continue pendant les calculs. Le README détaille le lien avec le notebook, chaque étape du traitement, les essais et les commandes pour les reproduire. Une version Python/OpenCV permet aussi de recevoir un flux H.264 et de conserver un essai en vidéo et CSV.

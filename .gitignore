@@ -41,6 +41,8 @@ checkpoints/
 *.avi
 *.mov
 *.mkv
+*.h264
+*.ts
 
 # IDE
 .vscode/

@@ -1,0 +1,48 @@
+{
+  "ouverture_fichier_local": "OK, URL blob, 1920 × 1080, 467.464 s",
+  "avance_retour": "OK : 0 → 5 → 0 s, en pause",
+  "lecture": {
+    "secondes_video": 15.172106,
+    "secondes_reelles": 15.164
+  },
+  "affichages": [
+    {
+      "apercus": 2,
+      "graphe": true,
+      "page": [
+        1280,
+        720
+      ],
+      "resultats": 492.796875,
+      "video": 739.1875,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "page": [
+        390,
+        700
+      ],
+      "resultats": 370,
+      "video": 370,
+      "viewport": [
+        390,
+        700
+      ]
+    },
+    {
+      "page": [
+        681,
+        645
+      ],
+      "resultats": 260.390625,
+      "video": 390.59375,
+      "viewport": [
+        681,
+        645
+      ]
+    }
+  ]
+}

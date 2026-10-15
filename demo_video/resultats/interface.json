@@ -1,0 +1,25 @@
+{
+  "import_video": "OK",
+  "inference_reelle": "OK",
+  "pause": "OK",
+  "reprise": "OK",
+  "recommencer": "OK",
+  "arret": "OK",
+  "image_par_image": "OK",
+  "avancer_reculer": "OK",
+  "barre_de_lecture": "OK",
+  "premiere_image": [
+    {
+      "boite": [
+        633.6646728515625,
+        184.57675170898438,
+        671.3216552734375,
+        226.68096923828125
+      ],
+      "classe": 10,
+      "nom": "Dépassement interdit aux poids lourds",
+      "yolo": 0.25795862078666687,
+      "cnn": 0.6796031594276428
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+-r ../requirements.txt
+opencv-python>=4.10,<6
+starlette==1.8.0
+uvicorn==0.54.0
