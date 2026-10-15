@@ -51,5 +51,30 @@ Friday, October 16, 2026.
 ## Deliverables
 
 1. Structured, commented notebook that runs end to end.
-2. Presentation of the approach, architectures, experiments and results.
+2. Concise presentation of the approach, architectures, experiments and results in the notebook's Markdown cells.
 3. Demo of the final model.
+
+## Notebook
+
+[panneaux_signalisation.ipynb](panneaux_signalisation.ipynb) contient la préparation des données GTSRB, un réseau dense, un CNN à deux blocs, les courbes d'apprentissage et une analyse des erreurs sur la **validation**.
+
+Les deux modèles sont essayés pendant 3 époques avec les mêmes données. On conserve le code, les réglages, les sorties et l'explication de chaque essai, y compris s'il est moins bon. Le test officiel est réservé à l'évaluation finale.
+
+Résultats du 15 octobre 2026, sur 31 350 images d'entraînement et 7 859 images de validation, séparées par séquence :
+
+| Modèle | Accuracy validation | Loss validation |
+|---|---:|---:|
+| Dense 128 | 73,13 % | 1,0243 |
+| CNN 32-64, dense 128 | 91,68 % | 0,3354 |
+
+Les courbes et l'analyse des erreurs sont dans le notebook. Ces scores sont calculés sur la validation.
+
+### Ce qui reste à faire
+
+- Compléter au moins trois expériences sur le CNN, en gardant chaque tentative et son interprétation.
+- Choisir le modèle sur la validation, puis évaluer une fois le modèle retenu sur le test officiel.
+- Vérifier et documenter les conditions d'utilisation du dataset.
+- Ajouter la détection de panneaux avec YOLO, puis la classification des zones extraites.
+- Finaliser la synthèse et la démonstration dans le notebook.
+
+La vidéo pourra être testée après la détection sur image.
