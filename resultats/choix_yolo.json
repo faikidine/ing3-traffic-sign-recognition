@@ -1,0 +1,9 @@
+{
+  "essai": "10 époques, 960",
+  "fichier_source": "models/yolo_panneaux_10epoques.pt",
+  "taille": 960,
+  "seuil": 0.25,
+  "iou_nms": 0.5,
+  "critere": "meilleure mAP50-95 en validation",
+  "test_utilise_pour_le_choix": false
+}

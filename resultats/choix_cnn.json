@@ -1,0 +1,7 @@
+{
+  "essai": "cnn_dropout03",
+  "fichier_source": "models/cnn_dropout03.keras",
+  "critere": "accuracy validation, puis loss validation en cas d'égalité",
+  "accuracy_validation": 0.9270899891853333,
+  "test_utilise_pour_le_choix": false
+}

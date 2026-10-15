@@ -1,6 +1,6 @@
 # Détection de panneaux dans une vidéo
 
-Cette démo prolonge la dernière partie du [notebook](../panneaux_signalisation.ipynb). Dans le notebook, nous donnons une photo de route à YOLO, puis nous classons les panneaux trouvés avec notre CNN. Ici, nous faisons la même chose sur des images prises pendant la lecture d'une vidéo.
+Cette démo reprend les premiers essais du [notebook](../panneaux_signalisation.ipynb), avec le CNN sans Dropout à trois époques et YOLO à cinq époques. Les comparaisons ajoutées ensuite et les modèles retenus sont présentés dans le notebook. Dans le notebook, nous donnons une photo de route à YOLO, puis nous classons les panneaux trouvés avec notre CNN. Ici, nous faisons la même chose sur des images prises pendant la lecture d'une vidéo.
 
 Les poids sont les mêmes. La démo n'entraîne aucun nouveau réseau et ne charge pas une vidéo déjà annotée : les rectangles, les catégories et les scores sont calculés pendant son utilisation.
 
