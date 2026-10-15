@@ -69,6 +69,14 @@ Résultats du 15 octobre 2026, sur 31 350 images d'entraînement et 7 859 images
 
 Les courbes et l'analyse des erreurs sont dans le notebook. Ces scores sont calculés sur la validation.
 
+### Vérification des données
+
+Après discussion dans le groupe, on a complété les contrôles de préparation. La séparation par séquences était déjà en place ; on conserve les mêmes 31 350 images d'entraînement et 7 859 images de validation. La liste des 1 307 séquences est maintenant enregistrée dans [sequences_train_validation.csv](resultats/sequences_train_validation.csv), puis rechargée pour vérifier qu'on retrouve les mêmes images dans le même ordre.
+
+Le [détail par classe](resultats/repartition_train_validation.csv) montre que la validation contient entre 14,29 % et 25 % des images selon la classe. Les classes 0, 19 et 37 n'ont chacune qu'une séquence de validation : leurs 30 photos représentent un seul panneau, ce qui limite l'interprétation de leurs scores.
+
+Les dimensions, les valeurs des pixels, les labels et leur encodage ont été vérifiés sur toutes les images préparées : [résultats des contrôles](resultats/controle_preparation.csv). Ces ajouts vérifient les données ; ils ne constituent pas de nouveaux entraînements. Les essais précédents et leurs résultats restent dans le notebook.
+
 ### Premiers essais YOLO
 
 YOLO11n apprend à localiser une seule classe, « panneau », sur GTSDB : 480 scènes pour l'entraînement, 120 pour la validation. Le CNN reconnaît ensuite la catégorie de chaque zone extraite.

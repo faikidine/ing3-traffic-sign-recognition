@@ -1,0 +1,3 @@
+Ensemble,Images vérifiées,Classes,Pixels min,Pixels max,Contrôles
+Train,31350,43,0.0,1.0,OK
+Validation,7859,43,0.0,1.0,OK

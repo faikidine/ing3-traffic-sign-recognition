@@ -1,0 +1,44 @@
+Classe,Panneau,Images Train,Séquences Train,Images Validation,Séquences Validation,Validation (%)
+0,Limitation 20 km/h,180,6,30,1,14.285714285714286
+1,Limitation 30 km/h,1770,59,450,15,20.27027027027027
+2,Limitation 50 km/h,1800,60,450,15,20.0
+3,Limitation 60 km/h,1140,38,270,9,19.148936170212767
+4,Limitation 70 km/h,1590,53,390,13,19.696969696969695
+5,Limitation 80 km/h,1500,50,360,12,19.35483870967742
+6,Fin de limitation 80 km/h,330,11,90,3,21.428571428571427
+7,Limitation 100 km/h,1140,38,300,10,20.833333333333332
+8,Limitation 120 km/h,1140,38,270,9,19.148936170212767
+9,Dépassement interdit,1170,39,300,10,20.408163265306122
+10,Dépassement interdit aux poids lourds,1620,54,390,13,19.402985074626866
+11,Priorité à la prochaine intersection,1050,35,270,9,20.454545454545453
+12,Route prioritaire,1680,56,420,14,20.0
+13,Cédez le passage,1710,57,450,15,20.833333333333332
+14,Stop,630,21,150,5,19.23076923076923
+15,Circulation interdite,510,17,120,4,19.047619047619047
+16,Poids lourds interdits,330,11,90,3,21.428571428571427
+17,Sens interdit,900,30,210,7,18.91891891891892
+18,Danger,960,32,240,8,20.0
+19,Virage à gauche,180,6,30,1,14.285714285714286
+20,Virage à droite,300,10,60,2,16.666666666666668
+21,Double virage,270,9,60,2,18.181818181818183
+22,Chaussée déformée,300,10,90,3,23.076923076923077
+23,Chaussée glissante,420,14,90,3,17.647058823529413
+24,Chaussée rétrécie à droite,210,7,60,2,22.22222222222222
+25,Travaux,1200,40,300,10,20.0
+26,Feux tricolores,480,16,120,4,20.0
+27,Passage piétons,180,6,60,2,25.0
+28,Enfants,420,14,120,4,22.22222222222222
+29,Cyclistes,210,7,60,2,22.22222222222222
+30,Neige ou verglas,360,12,90,3,20.0
+31,Animaux sauvages,630,21,150,5,19.23076923076923
+32,Fin des interdictions,180,6,60,2,25.0
+33,Tourner à droite,540,18,149,5,21.6255442670537
+34,Tourner à gauche,330,11,90,3,21.428571428571427
+35,Tout droit,960,32,240,8,20.0
+36,Tout droit ou à droite,300,10,90,3,23.076923076923077
+37,Tout droit ou à gauche,180,6,30,1,14.285714285714286
+38,Contournement par la droite,1650,55,420,14,20.28985507246377
+39,Contournement par la gauche,240,8,60,2,20.0
+40,Rond-point,300,10,60,2,16.666666666666668
+41,Fin d'interdiction de dépasser,180,6,60,2,25.0
+42,Fin d'interdiction de dépasser pour poids lourds,180,6,60,2,25.0
