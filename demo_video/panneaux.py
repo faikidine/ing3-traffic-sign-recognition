@@ -1,6 +1,6 @@
 """Détection des panneaux, puis classification de chaque zone par le CNN."""
 
-from pathlib import Path
+from functools import lru_cache
 
 import cv2
 import numpy as np
@@ -8,9 +8,9 @@ from PIL import Image
 import tensorflow as tf
 import torch
 from ultralytics import YOLO
+from configuration import fichiers_modeles, reglages_defaut
 
 
-MODELES = Path(__file__).resolve().parents[1] / "models"
 NOMS = [
     "Limitation 20 km/h", "Limitation 30 km/h", "Limitation 50 km/h",
     "Limitation 60 km/h", "Limitation 70 km/h", "Limitation 80 km/h",
@@ -28,15 +28,33 @@ NOMS = [
 ]
 
 
-def charger_modeles():
+@lru_cache(maxsize=4)
+def charger_yolo(nom):
+    detecteur = YOLO(str(fichiers_modeles()[nom]))
+    if nom != "yolo11n.pt" and len(detecteur.names) != 1:
+        raise ValueError("Le modèle YOLO doit détecter une seule classe : panneau.")
+    return detecteur
+
+
+@lru_cache(maxsize=8)
+def charger_cnn(nom):
+    cnn = tf.keras.models.load_model(fichiers_modeles()[nom], compile=False)
+    if cnn.input_shape != (None, 32, 32, 3) or cnn.output_shape != (None, 43):
+        raise ValueError("Le CNN doit recevoir des images RGB 32 × 32 et reconnaître 43 classes.")
+    return cnn
+
+
+def charger_modeles(yolo=None, cnn=None):
+    defaut = reglages_defaut()
     device = "cuda:0" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-    detecteur = YOLO(str(MODELES / "yolo_panneaux_5epoques.pt"))
-    cnn = tf.keras.models.load_model(MODELES / "cnn_3epoques.keras", compile=False)
-    return detecteur, cnn, device
+    return charger_yolo(yolo or defaut["yolo"]), charger_cnn(cnn or defaut["cnn"]), device
 
 
-def reconnaitre(image_bgr, detecteur, cnn, device, seuil=0.25, taille=640):
-    resultat = detecteur.predict(image_bgr, conf=seuil, iou=0.5, imgsz=taille, device=device, verbose=False)[0]
+def reconnaitre(image_bgr, detecteur, cnn, device, seuil=0.25, taille=640, iou=0.5):
+    # Le modèle COCO ne connaît que Stop parmi les panneaux : on exclut ses voitures, personnes, etc.
+    classes = [i for i, nom in detecteur.names.items() if nom == "stop sign"] if len(detecteur.names) > 1 else None
+    resultat = detecteur.predict(image_bgr, conf=seuil, iou=iou, imgsz=taille, classes=classes,
+                                 device=device, verbose=False)[0]
     boites = resultat.boxes.xyxy.cpu().numpy()
     scores = resultat.boxes.conf.cpu().numpy()
     if len(boites) == 0:

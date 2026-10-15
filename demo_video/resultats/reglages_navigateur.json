@@ -1,0 +1,42 @@
+{
+  "configuration_personnalisee": {
+    "cnn": "cnn_dense64.keras",
+    "yolo": "yolo_panneaux_5epoques.pt",
+    "taille": 640,
+    "seuil": 0.4,
+    "iou": 0.3,
+    "seuil_cnn": 0.8,
+    "cadence": 5
+  },
+  "changement_en_pause": true,
+  "configuration_conservee_apres_actualisation": true,
+  "annuler_conserve_configuration_active": true,
+  "retour_reglages_projet": true,
+  "page_sans_defilement": [
+    {
+      "largeur": 390,
+      "hauteur": 700
+    },
+    {
+      "largeur": 1280,
+      "hauteur": 720
+    }
+  ],
+  "capture": "reglages_lecteur.jpg",
+  "lecture_jusqu_a_la_fin": {
+    "video": "belgique_0000.mp4",
+    "cnn": "cnn_6epoques.keras",
+    "yolo": "yolo_final.pt",
+    "taille": 960,
+    "cadence": 5,
+    "duree_secondes": 60
+  },
+  "essai_ligne_de_commande": {
+    "cnn": "cnn_dense64.keras",
+    "yolo": "yolo_panneaux_5epoques.pt",
+    "taille": 640,
+    "iou": 0.3,
+    "images_traitees": 3,
+    "termine_sans_erreur": true
+  }
+}

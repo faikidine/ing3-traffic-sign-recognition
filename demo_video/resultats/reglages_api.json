@@ -1,0 +1,285 @@
+{
+  "couples_testes": 20,
+  "inference_identique_appel_direct": true,
+  "modeles_reutilises_sans_rechargement": true,
+  "reglages_invalides_refuses": 7,
+  "calcul_concurrent_refuse": true,
+  "lecture_partielle_video": true,
+  "essais": [
+    {
+      "configuration": {
+        "cnn": "cnn_final.keras",
+        "yolo": "yolo_final.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 287.5
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_3epoques.keras",
+        "yolo": "yolo_final.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 35.8
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_6epoques.keras",
+        "yolo": "yolo_final.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 32.0
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dense64.keras",
+        "yolo": "yolo_final.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 32.8
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dropout03.keras",
+        "yolo": "yolo_final.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 33.9
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_final.keras",
+        "yolo": "yolo_panneaux_10epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 83.2
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_3epoques.keras",
+        "yolo": "yolo_panneaux_10epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 14.4
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_6epoques.keras",
+        "yolo": "yolo_panneaux_10epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 14.4
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dense64.keras",
+        "yolo": "yolo_panneaux_10epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 16.1
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dropout03.keras",
+        "yolo": "yolo_panneaux_10epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 5,
+      "calcul_ms": 17.7
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_final.keras",
+        "yolo": "yolo_panneaux_5epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 4,
+      "calcul_ms": 165.7
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_3epoques.keras",
+        "yolo": "yolo_panneaux_5epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 4,
+      "calcul_ms": 14.6
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_6epoques.keras",
+        "yolo": "yolo_panneaux_5epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 4,
+      "calcul_ms": 14.3
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dense64.keras",
+        "yolo": "yolo_panneaux_5epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 4,
+      "calcul_ms": 15.1
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dropout03.keras",
+        "yolo": "yolo_panneaux_5epoques.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 4,
+      "calcul_ms": 14.5
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_final.keras",
+        "yolo": "yolo11n.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 0,
+      "calcul_ms": 131.7
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_3epoques.keras",
+        "yolo": "yolo11n.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 0,
+      "calcul_ms": 17.3
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_6epoques.keras",
+        "yolo": "yolo11n.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 0,
+      "calcul_ms": 11.7
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dense64.keras",
+        "yolo": "yolo11n.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 0,
+      "calcul_ms": 10.0
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dropout03.keras",
+        "yolo": "yolo11n.pt",
+        "taille": 640,
+        "seuil": 0.25,
+        "iou": 0.5
+      },
+      "panneaux": 0,
+      "calcul_ms": 10.3
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dense64.keras",
+        "yolo": "yolo_panneaux_10epoques.pt",
+        "taille": 960,
+        "seuil": 0.4,
+        "iou": 0.3
+      },
+      "panneaux": 3,
+      "calcul_ms": 118.8
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_3epoques.keras",
+        "yolo": "yolo_panneaux_5epoques.pt",
+        "taille": 960,
+        "seuil": 0.4,
+        "iou": 0.3
+      },
+      "panneaux": 2,
+      "calcul_ms": 17.4
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dense64.keras",
+        "yolo": "yolo_panneaux_10epoques.pt",
+        "taille": 960,
+        "seuil": 0.4,
+        "iou": 0.3
+      },
+      "panneaux": 3,
+      "calcul_ms": 15.8
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dense64.keras",
+        "yolo": "yolo_panneaux_10epoques.pt",
+        "taille": 320,
+        "seuil": 0.4,
+        "iou": 0.3
+      },
+      "panneaux": 2,
+      "calcul_ms": 161.6
+    },
+    {
+      "configuration": {
+        "cnn": "cnn_dense64.keras",
+        "yolo": "yolo_panneaux_10epoques.pt",
+        "taille": 1280,
+        "seuil": 0.4,
+        "iou": 0.3
+      },
+      "panneaux": 2,
+      "calcul_ms": 178.5
+    }
+  ]
+}

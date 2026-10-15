@@ -9,6 +9,7 @@ import time
 import unicodedata
 
 import cv2
+from configuration import catalogue, reglages_defaut
 
 
 DOSSIER = Path(__file__).resolve().parent
@@ -38,18 +39,23 @@ def annoter(image, detections):
 
 
 def main():
+    defaut = reglages_defaut()
+    modeles = catalogue()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("sources", nargs="*", help="Vidéos locales ou URL de flux (UDP, RTSP, HTTP)")
     parser.add_argument("--boucle", action="store_true", help="Rejouer les vidéos à la fin")
-    parser.add_argument("--seuil", type=float, default=0.25, help="Seuil YOLO")
-    parser.add_argument("--taille", type=int, default=640, help="Taille d'entrée de YOLO")
+    parser.add_argument("--yolo", choices=[m["id"] for m in modeles["yolo"]], default=defaut["yolo"])
+    parser.add_argument("--cnn", choices=[m["id"] for m in modeles["cnn"]], default=defaut["cnn"])
+    parser.add_argument("--seuil", type=float, default=defaut["seuil"], help="Seuil YOLO")
+    parser.add_argument("--iou", type=float, default=defaut["iou"], help="IoU de suppression des doublons")
+    parser.add_argument("--taille", type=int, default=defaut["taille"], help="Taille d'entrée de YOLO")
     parser.add_argument("--sortie", type=Path, help="Enregistrer la vidéo annotée en MP4 H.264")
     parser.add_argument("--journal", type=Path, help="Conserver les prédictions image par image en CSV")
     parser.add_argument("--sans-affichage", action="store_true")
     parser.add_argument("--max-images", type=int, default=0, help="Arrêter après N images (0 : tout)")
     args = parser.parse_args()
-    if not 0 < args.seuil <= 1 or args.taille < 32 or args.max_images < 0:
-        parser.error("Seuil attendu entre 0 et 1, taille >= 32 et max-images >= 0.")
+    if not 0 < args.seuil <= 1 or not 0 < args.iou <= 1 or args.taille < 32 or args.max_images < 0:
+        parser.error("Seuil et IoU attendus entre 0 et 1, taille >= 32 et max-images >= 0.")
     sources = args.sources or [str(p) for p in sorted((DOSSIER / "data").glob("*.mp4"))]
     if not sources:
         parser.error("Aucune vidéo. Lancez preparer_video.py ou indiquez un fichier vidéo.")
@@ -60,7 +66,7 @@ def main():
 
     from panneaux import charger_modeles, reconnaitre
 
-    detecteur, cnn, device = charger_modeles()
+    detecteur, cnn, device = charger_modeles(args.yolo, args.cnn)
     journal = None
     capture = None
     sortie = None
@@ -103,7 +109,7 @@ def main():
                             print("Flux terminé ou interrompu.", flush=True)
                         break
                     debut = time.perf_counter()
-                    detections = reconnaitre(image, detecteur, cnn, device, args.seuil, args.taille)
+                    detections = reconnaitre(image, detecteur, cnn, device, args.seuil, args.taille, args.iou)
                     duree = time.perf_counter() - debut
                     duree_traitement += duree
                     fps_lisse = 1 / duree if fps_lisse is None else 0.9 * fps_lisse + 0.1 / duree

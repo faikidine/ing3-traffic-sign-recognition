@@ -10,6 +10,7 @@ from starlette.applications import Starlette
 from starlette.responses import FileResponse, JSONResponse
 from starlette.routing import Route
 from starlette.staticfiles import StaticFiles
+from configuration import catalogue, reglages_defaut, valider_reglages, TAILLES
 
 
 DOSSIER = Path(__file__).resolve().parent
@@ -21,7 +22,9 @@ def charger():
     from panneaux import charger_modeles, reconnaitre
 
     modeles = charger_modeles()
-    reconnaitre(np.zeros((640, 640, 3), dtype="uint8"), *modeles)
+    reglages = reglages_defaut()
+    reconnaitre(np.zeros((640, 640, 3), dtype="uint8"), *modeles,
+                taille=reglages["taille"], seuil=reglages["seuil"], iou=reglages["iou"])
     modeles[1](np.zeros((1, 32, 32, 3), dtype="float32"), training=False)
     return modeles
 
@@ -73,10 +76,14 @@ async def etat(request):
                          "erreur": request.app.state.erreur})
 
 
-def analyser(contenu, modeles, seuil, taille):
+async def modeles_disponibles(request):
+    return JSONResponse({**catalogue(), "defaut": reglages_defaut(), "tailles": TAILLES})
+
+
+def analyser(contenu, reglages):
     import cv2
     import numpy as np
-    from panneaux import reconnaitre
+    from panneaux import charger_modeles, reconnaitre
 
     debut = time.perf_counter()
     if not contenu:
@@ -84,11 +91,14 @@ def analyser(contenu, modeles, seuil, taille):
     image = cv2.imdecode(np.frombuffer(contenu, dtype=np.uint8), cv2.IMREAD_COLOR)
     if image is None or max(image.shape[:2]) > 2560:
         raise ValueError("Image illisible ou trop grande.")
-    detections = reconnaitre(image, *modeles, seuil=seuil, taille=taille)
+    modeles = charger_modeles(reglages["yolo"], reglages["cnn"])
+    detections = reconnaitre(image, *modeles, seuil=reglages["seuil"], taille=reglages["taille"],
+                             iou=reglages["iou"])
     hauteur, largeur = image.shape[:2]
     for d in detections:
         d["boite"] = [v / (largeur if i % 2 == 0 else hauteur) for i, v in enumerate(d["boite"])]
-    return {"detections": detections, "calcul_ms": round((time.perf_counter() - debut) * 1000, 1)}
+    return {"detections": detections, "calcul_ms": round((time.perf_counter() - debut) * 1000, 1),
+            "configuration": reglages}
 
 
 async def detection(request):
@@ -99,10 +109,7 @@ async def detection(request):
     if etat.verrou.locked():
         return JSONResponse({"erreur": "Calcul en cours."}, status_code=429)
     try:
-        seuil = float(request.query_params.get("seuil", "0.25"))
-        taille = int(request.query_params.get("taille", "640"))
-        if not 0.05 <= seuil <= 0.95 or taille not in (320, 640, 960):
-            raise ValueError("Réglage invalide.")
+        reglages = valider_reglages(request.query_params)
         contenu = bytearray()
         async for morceau in request.stream():
             contenu.extend(morceau)
@@ -112,14 +119,16 @@ async def detection(request):
             return JSONResponse({"erreur": "Calcul en cours."}, status_code=429)
         async with etat.verrou:
             resultat = await asyncio.get_running_loop().run_in_executor(
-                etat.worker, analyser, contenu, etat.modeles, seuil, taille)
+                etat.worker, analyser, contenu, reglages)
         return JSONResponse(resultat)
-    except ValueError as erreur:
+    except (ValueError, TypeError) as erreur:
         return JSONResponse({"erreur": str(erreur)}, status_code=400)
+    except (OSError, KeyError) as erreur:
+        return JSONResponse({"erreur": "Impossible de charger le modèle choisi : " + str(erreur)}, status_code=400)
 
 
 app = Starlette(lifespan=duree_application, routes=[
-    Route("/", accueil), Route("/etat", etat), Route("/videos", videos),
+    Route("/", accueil), Route("/etat", etat), Route("/modeles", modeles_disponibles), Route("/videos", videos),
     Route("/video/{numero:int}", video), Route("/detecter", detection, methods=["POST"]),
 ])
 app.mount("/web", StaticFiles(directory=DOSSIER / "web"), name="web")

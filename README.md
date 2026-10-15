@@ -142,4 +142,4 @@ L'arrêt anticipé du CNN et le choix d'un autre seuil YOLO seraient des essais 
 
 ### Démo vidéo
 
-[demo_video/](demo_video/README.md) conserve la démo des premiers essais avec le CNN à trois époques sans Dropout et YOLO à cinq époques. Elle propose la lecture, la pause, les déplacements, les rectangles et les scores calculés pendant la vidéo. Les modèles retenus après comparaison sont présentés sur les scènes de test à la fin du notebook.
+[demo_video/](demo_video/README.md) permet de choisir le CNN et YOLO dans **Réglages**, ainsi que la taille des images, le seuil YOLO, l'IoU, le seuil d'affichage des catégories et la fréquence d'analyse. Les modèles retenus sont proposés au départ ; les premiers essais restent sélectionnables. Les calculs se font pendant la lecture, avec pause, déplacements, rectangles et scores. Chaque changement de configuration vide les résultats précédents pour comparer les essais sans les mélanger.

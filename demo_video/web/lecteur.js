@@ -8,6 +8,64 @@ let pret = false, occupe = false, version = 0, derniereAnalyse = -1;
 let dernierEnvoi = 0, instantResultat = -1, detections = [], historique = [], terminees = [];
 let vueHistorique = false, fichierLocal = null;
 let mesures = [], apercus = [], dernierApercu = -Infinity;
+let catalogue = null, config = null, bloque = false;
+const cleReglages = "panneaux-reglages-v1";
+
+function afficherConfiguration() {
+  if (!catalogue || !config) return;
+  const nom = genre => catalogue[genre].find(m => m.id === config[genre])?.nom || config[genre];
+  $("etat").textContent = `${nom("yolo")} / ${nom("cnn")} · ${config.taille} px`;
+}
+
+function remplirReglages(valeurs) {
+  for (const cle of ["cnn", "yolo", "taille", "seuil", "iou", "seuil_cnn", "cadence"]) $(cle).value = valeurs[cle];
+  for (const cle of ["seuil", "iou", "seuil_cnn"]) $("valeur-" + cle).textContent = Number($(cle).value).toFixed(2);
+  $("boucle").checked = valeurs.boucle;
+}
+
+function appliquerReglages(valeurs) {
+  config = {...valeurs};
+  video.loop = config.boucle;
+  bloque = false;
+  historique = []; apercus = [];
+  $("apercus").hidden = true;
+  $("vignettes").replaceChildren();
+  invalider();
+  erreur();
+  afficherConfiguration();
+  try { localStorage.setItem(cleReglages, JSON.stringify(config)); } catch {}
+  analyser();
+}
+
+async function chargerReglages() {
+  const reponse = await fetch("/modeles");
+  if (!reponse.ok) throw new Error("Impossible de charger les modèles disponibles.");
+  catalogue = await reponse.json();
+  for (const genre of ["cnn", "yolo"]) {
+    for (const m of catalogue[genre]) $(genre).append(new Option(m.nom, m.id));
+  }
+  for (const taille of catalogue.tailles) $("taille").append(new Option(taille, taille));
+  if (!catalogue.cnn.length || !catalogue.yolo.length) throw new Error("Il manque un modèle CNN ou YOLO dans models/.");
+  let sauvegarde = {};
+  try { sauvegarde = JSON.parse(localStorage.getItem(cleReglages)) || {}; } catch {}
+  // Les choix enregistrés ne doivent pas pointer vers un fichier retiré depuis.
+  remplirReglages(catalogue.defaut);
+  for (const cle of ["cnn", "yolo", "taille", "cadence"]) {
+    if ([...$(cle).options].some(o => o.value === String(sauvegarde[cle]))) $(cle).value = sauvegarde[cle];
+  }
+  for (const cle of ["seuil", "iou", "seuil_cnn"]) {
+    if (typeof sauvegarde[cle] === "number" && Number.isFinite(sauvegarde[cle])) $(cle).value = sauvegarde[cle];
+  }
+  if (typeof sauvegarde.boucle === "boolean") $("boucle").checked = sauvegarde.boucle;
+  appliquerReglages(lireReglages());
+  $("reglages").disabled = false;
+}
+
+function lireReglages() {
+  return {cnn: $("cnn").value, yolo: $("yolo").value, taille: Number($("taille").value),
+    seuil: Number($("seuil").value), iou: Number($("iou").value), seuil_cnn: Number($("seuil_cnn").value),
+    cadence: Number($("cadence").value), boucle: $("boucle").checked};
+}
 
 function temps(secondes) {
   if (!Number.isFinite(secondes)) return "0:00";
@@ -38,7 +96,7 @@ function tableau() {
   }
   const corps = table.createTBody();
   for (const d of lignes) {
-    const valeurs = [d.cnn >= .65 ? d.nom : "Catégorie incertaine", `${(d.yolo * 100).toFixed(0)} %`, `${(d.cnn * 100).toFixed(0)} %`];
+    const valeurs = [d.cnn >= config.seuil_cnn ? d.nom : "Catégorie incertaine", `${(d.yolo * 100).toFixed(0)} %`, `${(d.cnn * 100).toFixed(0)} %`];
     if (vueHistorique) valeurs.unshift(temps(d.instant));
     const ligne = corps.insertRow();
     for (const valeur of valeurs) ligne.insertCell().textContent = valeur;
@@ -81,7 +139,7 @@ function completerResultats(instant) {
     image.alt = `Zone détectée à ${temps(d.instant)}`;
     const legende = document.createElement("figcaption");
     const nom = document.createElement("strong");
-    nom.textContent = d.cnn >= .65 ? d.nom : "Catégorie incertaine";
+    nom.textContent = d.cnn >= config.seuil_cnn ? d.nom : "Catégorie incertaine";
     nom.title = nom.textContent;
     legende.append(nom, `${temps(d.instant)} · CNN ${(d.cnn * 100).toFixed(0)} %`);
     figure.append(image, legende);
@@ -98,9 +156,9 @@ function dessiner() {
   for (const d of detections) {
     const [x1, y1, x2, y2] = d.boite;
     const x = x1 * largeur, y = y1 * hauteur;
-    dessin.strokeStyle = dessin.fillStyle = d.cnn >= .65 ? "#227c3a" : "#9c5c00";
+    dessin.strokeStyle = dessin.fillStyle = d.cnn >= config.seuil_cnn ? "#227c3a" : "#9c5c00";
     dessin.strokeRect(x, y, (x2 - x1) * largeur, (y2 - y1) * hauteur);
-    const texte = `${d.cnn >= .65 ? d.nom : "Catégorie incertaine"} · ${(d.cnn * 100).toFixed(0)} %`;
+    const texte = `${d.cnn >= config.seuil_cnn ? d.nom : "Catégorie incertaine"} · ${(d.cnn * 100).toFixed(0)} %`;
     const w = Math.min(largeur, dessin.measureText(texte).width + 10);
     const tx = Math.max(0, Math.min(x, largeur - w));
     const ty = y >= 22 ? y - 22 : y;
@@ -139,11 +197,11 @@ function invalider() {
 }
 
 async function analyser() {
-  if (!pret || occupe || video.seeking || video.readyState < 2 || document.hidden) return;
+  if (!pret || !config || bloque || occupe || video.seeking || video.readyState < 2 || document.hidden) return;
   const instant = video.currentTime;
   if (Math.abs(instant - derniereAnalyse) < .001) return;
   const maintenant = performance.now();
-  if (!video.paused && maintenant - dernierEnvoi < 80) return;
+  if (!video.paused && maintenant - dernierEnvoi < 1000 / config.cadence) return;
   occupe = true;
   dernierEnvoi = maintenant;
   const demande = version;
@@ -155,14 +213,19 @@ async function analyser() {
     pixels.drawImage(video, 0, 0, w, h);
     const jpeg = await new Promise((resolve) => capture.toBlob(resolve, "image/jpeg", .88));
     if (demande !== version || !jpeg) return;
-    const reponse = await fetch(`/detecter?seuil=${$("seuil").value}&taille=${$("taille").value}`, {
+    const parametres = new URLSearchParams({cnn: config.cnn, yolo: config.yolo,
+      seuil: config.seuil, taille: config.taille, iou: config.iou});
+    const reponse = await fetch(`/detecter?${parametres}`, {
       method: "POST", headers: {"Content-Type": "image/jpeg"}, body: jpeg,
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(30000),
     });
     if (reponse.status === 429) return;
     const resultat = await reponse.json();
-    if (!reponse.ok) throw new Error(resultat.erreur || "Calcul indisponible.");
     if (demande !== version) return;
+    if (!reponse.ok) {
+      if (reponse.status === 400) bloque = true;
+      throw new Error(resultat.erreur || "Calcul indisponible.");
+    }
     derniereAnalyse = instant;
     // On écarte une réponse devenue trop ancienne au lieu de décaler les boîtes.
     if (Math.abs(video.currentTime - instant) > (video.paused ? .1 : .45 * video.playbackRate)) return;
@@ -264,12 +327,19 @@ video.addEventListener("loadedmetadata", () => {
 video.addEventListener("loadeddata", actualiser);
 video.addEventListener("error", () => erreur("Cette vidéo ne peut pas être lue. Essayer un MP4 H.264."));
 $("reglages").onclick = () => {
-  $("options").hidden = !$("options").hidden;
-  $("reglages").setAttribute("aria-expanded", String(!$("options").hidden));
+  remplirReglages(config);
+  $("options").showModal();
 };
-$("seuil").oninput = () => { $("valeur").textContent = Number($("seuil").value).toFixed(2); };
-for (const id of ["seuil", "taille"]) $(id).onchange = () => { invalider(); analyser(); };
-$("boucle").onchange = () => { video.loop = $("boucle").checked; };
+for (const cle of ["seuil", "iou", "seuil_cnn"]) $(cle).oninput = () => {
+  $("valeur-" + cle).textContent = Number($(cle).value).toFixed(2);
+};
+$("annuler").onclick = () => $("options").close();
+$("defaut").onclick = () => remplirReglages(catalogue.defaut);
+$("form-reglages").onsubmit = (evenement) => {
+  evenement.preventDefault();
+  appliquerReglages(lireReglages());
+  $("options").close();
+};
 for (const id of ["actuel", "historique"]) $(id).onclick = () => {
   vueHistorique = id === "historique";
   $("actuel").setAttribute("aria-selected", String(!vueHistorique));
@@ -286,7 +356,7 @@ async function verifierModeles() {
     pret = etat.pret;
     $("etat").textContent = etat.erreur ? "Modèles indisponibles" : pret ? "YOLO11n + CNN · prêt" : "Chargement des modèles…";
     if (etat.erreur) { erreur(etat.erreur); return; }
-    if (pret) { analyser(); return; }
+    if (pret) { afficherConfiguration(); analyser(); return; }
   } catch {
     $("etat").textContent = "Connexion au serveur…";
   }
@@ -296,4 +366,4 @@ fetch("/videos").then(r => r.json()).then(videos => {
   for (const v of videos) $("source").append(new Option(v.nom, v.url));
   if (videos.length) { $("source").value = videos[0].url; choisir(videos[0].url); }
 }).catch(() => erreur("Impossible de charger la liste des vidéos."));
-verifierModeles();
+chargerReglages().then(verifierModeles).catch(e => erreur(e.message));

@@ -1,6 +1,6 @@
 # Détection de panneaux dans une vidéo
 
-Cette démo reprend les premiers essais du [notebook](../panneaux_signalisation.ipynb), avec le CNN sans Dropout à trois époques et YOLO à cinq époques. Les comparaisons ajoutées ensuite et les modèles retenus sont présentés dans le notebook. Dans le notebook, nous donnons une photo de route à YOLO, puis nous classons les panneaux trouvés avec notre CNN. Ici, nous faisons la même chose sur des images prises pendant la lecture d'une vidéo.
+Cette démo reprend les modèles du [notebook](../panneaux_signalisation.ipynb). On peut choisir le CNN et YOLO séparément dans **Réglages**, puis comparer leurs réponses sur la même vidéo. Au premier lancement, les modèles retenus dans le projet sont sélectionnés : CNN avec Dropout et YOLO à dix époques, avec une entrée de 960 pixels.
 
 Les poids sont les mêmes. La démo n'entraîne aucun nouveau réseau et ne charge pas une vidéo déjà annotée : les rectangles, les catégories et les scores sont calculés pendant son utilisation.
 
@@ -17,11 +17,11 @@ Les commandes suivantes se lancent depuis la racine du projet.
 2. Avoir ces deux fichiers, produits par le notebook :
 
    ```text
-   models/cnn_3epoques.keras
-   models/yolo_panneaux_5epoques.pt
+   models/cnn_final.keras
+   models/yolo_final.pt
    ```
 
-   Ils sont déjà présents sur la machine utilisée pour les essais. Ils ne sont pas inclus dans Git. Sur une autre machine, copier ces deux fichiers dans `models/` permet de reprendre exactement les poids utilisés ici. Pour refaire aussi l'apprentissage, exécuter le notebook dans l'ordre : préparation des données, entraînement du CNN, puis partie YOLO. Le notebook sauvegarde le CNN et copie le meilleur modèle YOLO de l'essai de cinq époques vers ces chemins. Un nouvel entraînement peut donner des valeurs légèrement différentes ; les fichiers sauvegardés permettent de rejouer le même modèle.
+   Ils sont déjà présents sur la machine utilisée pour les essais. Ils ne sont pas inclus dans Git. Sur une autre machine, copier ces deux fichiers dans `models/` permet de reprendre exactement les poids utilisés ici. Pour refaire aussi l'apprentissage, exécuter le notebook dans l'ordre : préparation des données, entraînement du CNN, puis partie YOLO. Le notebook sauvegarde les modèles retenus vers ces chemins. Les autres poids permettent de choisir les essais précédents dans le lecteur. Un nouvel entraînement peut donner des valeurs légèrement différentes ; les fichiers sauvegardés permettent de rejouer le même modèle.
 
 3. Démarrer le lecteur :
 
@@ -31,7 +31,7 @@ Les commandes suivantes se lancent depuis la racine du projet.
 
 4. Ouvrir [http://127.0.0.1:8501](http://127.0.0.1:8501), cliquer sur **Ouvrir une vidéo**, choisir son fichier puis cliquer sur **Lire**. Un MP4 contenant du H.264 convient. Pour d'autres formats, la lecture dépend des codecs pris en charge par le navigateur.
 
-La vidéo s'ouvre directement depuis le fichier choisi : il n'est pas nécessaire d'attendre l'envoi de tout le fichier à Python. On peut mettre en pause, déplacer la barre de lecture, utiliser **−5 s**, **+5 s**, **Début** ou passer en plein écran. **Réglages** donne accès au seuil de détection, à la taille d'entrée YOLO et à la lecture en boucle. Après un déplacement, une nouvelle analyse est faite à l'instant choisi, même en pause.
+La vidéo s'ouvre directement depuis le fichier choisi : il n'est pas nécessaire d'attendre l'envoi de tout le fichier à Python. On peut mettre en pause, déplacer la barre de lecture, utiliser **−5 s**, **+5 s**, **Début** ou passer en plein écran. **Réglages** permet de choisir les modèles et leurs paramètres. Après un déplacement, une nouvelle analyse est faite à l'instant choisi, même en pause.
 
 Pour utiliser notre exemple de route belge :
 
@@ -41,23 +41,36 @@ python demo_video/preparer_video.py
 
 Le script télécharge la séquence 03, caméra 00, de BelgiumTS (environ 605 Mo), trie les images et assemble les 600 premières dans `demo_video/data/belgique_0000.mp4`. La vidéo dure une minute à 10 images/s. Elle apparaît dans la liste du lecteur après actualisation de la page. `--debut 600 --images 600` permet de prendre la portion suivante.
 
+## Choisir les modèles et les réglages
+
+Cliquer sur **Réglages**, choisir les valeurs puis **Appliquer**. **Annuler** ferme sans modifier la configuration. **Réglages du projet** remet les valeurs de départ dans le formulaire ; cliquer ensuite sur Appliquer.
+
+| Choix | Effet |
+|---|---|
+| Détecteur YOLO | Poids retenus, cinq époques, dix époques ou COCO sans adaptation. Avec COCO, seules les détections « Stop » passent au CNN ; les voitures et les personnes sont exclues. |
+| Modèle CNN | Poids retenus, CNN initial à trois époques, six époques, dense 64 ou Dropout 0,3. |
+| Taille YOLO | 320, 640, 960 ou 1 280 pixels. Une grande taille conserve davantage de détails, avec plus de calcul. |
+| Seuil YOLO | De 0,05 à 0,95. Le monter écarte les détections moins confiantes, avec le risque de manquer des panneaux. |
+| IoU pour retirer les doublons | De 0,1 à 0,9. Une valeur plus basse supprime davantage de rectangles qui se recouvrent. |
+| Seuil d'affichage de la catégorie | De 0 à 1, avec 0,65 au départ. En dessous, le rectangle reste visible mais sa catégorie est indiquée comme incertaine. Cela ne change pas les calculs du CNN. |
+| Analyses par seconde | Maximum de 2, 5, 10, 12,5 ou 20 analyses/s. La vidéo continue à sa cadence normale ; ce réglage concerne les calculs. |
+| Rejouer | Recommencer la vidéo à la fin. |
+
+Les choix sont conservés dans ce navigateur après actualisation. Chaque page envoie sa propre configuration : changer les modèles dans un lecteur ne modifie pas ceux d'un autre lecteur. Après Appliquer, les rectangles, l'historique, la courbe et les aperçus repartent à zéro pour ne pas mélanger les essais. La position de lecture reste la même et une nouvelle analyse se fait aussi en pause.
+
+Les listes montrent les fichiers présents dans `models/` : `cnn_*.keras` pour les CNN et `yolo_*.pt` pour les détecteurs adaptés. Les fichiers « retenu » sont les copies sauvegardées lors du choix final ; ils correspondent actuellement au CNN Dropout et au YOLO de dix époques. Le réseau dense de référence n'apparaît pas car ses poids n'ont pas été sauvegardés. `yolo11n.pt`, à la racine, permet de refaire le premier essai COCO.
+
+Les CNN doivent recevoir des images RGB de 32 × 32 et sortir les 43 classes dans l'ordre du projet. Les YOLO adaptés détectent une seule classe, « panneau ». Ajouter des poids compatibles dans `models/`, puis actualiser la page, les fait apparaître dans les listes.
+
 ## Ce que nous reprenons du notebook
 
-| Partie du projet | Dans la démo |
-|---|---|
-| Réseau dense sur GTSRB | Conservé comme point de comparaison dans le notebook ; il n'intervient pas dans la démo. |
-| CNN entraîné pendant 3 époques sur GTSRB | Même modèle `cnn_3epoques.keras`, avec les mêmes 43 catégories, dans le même ordre. |
-| YOLO11n adapté pendant 5 époques sur GTSDB | Même fichier `yolo_panneaux_5epoques.pt`, qui correspond au meilleur poids sauvegardé pendant cet essai. |
-| Détection puis classification sur une scène | Même enchaînement : YOLO → boîte → découpe avec marge → redimensionnement → CNN. |
-| Réglages de détection de l'évaluation | Par défaut : confiance YOLO 0,25, IoU de suppression des doublons 0,5 et taille YOLO 640. |
+Les poids, l'ordre des 43 catégories et le traitement des zones sont identiques à ceux du projet. Les pixels sont divisés par 255 après redimensionnement en RGB 32 × 32. Le CNN utilise deux convolutions de 32 puis 64 filtres, du pooling et une couche dense ; les variantes changent la durée d'entraînement, la taille de cette couche ou le Dropout. Pendant la prédiction, le Dropout est désactivé.
 
-Le CNN a appris sur des images de panneaux déjà cadrés. Son entrée est une image RGB de **32 × 32 pixels**, avec les valeurs des pixels divisées par 255. Il contient deux convolutions 3 × 3 de 32 puis 64 filtres, chacune suivie d'un max pooling 2 × 2, puis `Flatten`, une couche dense de 128 neurones et une sortie Softmax de 43 neurones. Les convolutions et la couche dense intermédiaire utilisent ReLU. L'apprentissage utilise Adam à 0,001, la cross-entropie catégorielle, des lots de 64 et trois époques.
+Le CNN retenu atteint **92,71 % en validation GTSRB** et **91,69 % sur son test officiel**. Cela mesure la reconnaissance de panneaux cadrés, pas le taux de réussite d'une vidéo quelconque.
 
-Ce CNN atteint **91,68 % d'accuracy sur la validation GTSRB** du notebook. Cela mesure la reconnaissance de panneaux cadrés dans ce jeu de données. Ce n'est pas le taux de réussite de la vidéo.
+YOLO apprend à localiser une seule classe sur 480 scènes GTSDB, avec 120 scènes de validation. Les essais de cinq et dix époques utilisent une taille d'entraînement de 640 pixels, des lots de 8 et AdamW à 0,001. Le modèle retenu est ensuite utilisé à 960 pixels. Les réglages de départ viennent de `resultats/choix_yolo.json` : seuil 0,25 et IoU de suppression des doublons 0,5.
 
-YOLO a un autre rôle : trouver **où se trouvent les panneaux** dans toute la scène. Nous sommes partis de YOLO11n pré-entraîné sur COCO, puis avons adapté ses poids à une seule classe, « panneau », sur 480 scènes GTSDB, avec 120 scènes pour la validation. L'essai dure cinq époques, à 640 pixels, avec des lots de 8, AdamW et un taux initial de 0,001. Le notebook contient les réglages d'augmentation et les courbes de cet essai. La démo utilise le modèle adapté, pas le modèle COCO de départ.
-
-Sur les 120 scènes de validation du notebook, la chaîne retrouve 75 panneaux sur 98, dont 71 sont bien classés. Il reste 23 panneaux manqués et 11 fausses détections. Ces résultats servent de référence pour comprendre les limites observées ensuite dans la vidéo.
+Sur la validation, la première chaîne retrouvait 75 panneaux sur 98, dont 71 bien classés, avec 11 fausses détections. La chaîne retenue en retrouve 91, dont 89 bien classés, avec 38 fausses détections. Choisir les anciens modèles permet de comparer ce compromis sur la vidéo sans réentraîner les réseaux.
 
 ## Ce qui se passe pendant la lecture
 
@@ -67,7 +80,7 @@ Le lecteur utilise HTML et JavaScript pour afficher la vidéo, et un petit serve
 
 Le navigateur décode la vidéo et la lit à sa cadence normale, avec son son et ses commandes habituelles. Lorsqu'une nouvelle image est affichée, le lecteur peut en prendre une copie pour l'analyse.
 
-Une seule demande de calcul peut être en cours par lecteur. Si Python est occupé, la vidéo continue et les images intermédiaires ne sont pas mises en attente. Une fois le calcul terminé, la prochaine demande porte sur une image récente. Les demandes sont espacées d'au moins 80 ms, soit au maximum 12,5 analyses/s ; la cadence réelle peut être inférieure, selon la vidéo et le temps de calcul.
+Une seule demande de calcul peut être en cours par lecteur. Si Python est occupé, la vidéo continue et les images intermédiaires ne sont pas mises en attente. Une fois le calcul terminé, la prochaine demande porte sur une image récente. Avec le réglage initial de 12,5 analyses/s, les demandes sont espacées d'au moins 80 ms ; la cadence réelle peut être inférieure, selon la vidéo et le temps de calcul.
 
 Ainsi, une vidéo à 30 images/s reste lue à 30 images/s sans exiger 30 passages dans les réseaux chaque seconde. En contrepartie, un panneau visible très brièvement peut passer entre deux analyses. Il n'y a pas de suivi d'objet entre les images.
 
@@ -79,7 +92,7 @@ C'est une différence avec les photos fixes du notebook : la réduction et la co
 
 ### 3. Localiser les panneaux avec YOLO
 
-Python décode le JPEG avec OpenCV. La fonction `reconnaitre()` de [panneaux.py](panneaux.py) appelle le modèle YOLO avec `conf=0.25`, `iou=0.5` et `imgsz=640` par défaut. Ultralytics adapte l'image à cette taille en conservant ses proportions et en ajoutant les bordures nécessaires.
+Python décode le JPEG avec OpenCV. La fonction `reconnaitre()` de [panneaux.py](panneaux.py) appelle le modèle YOLO choisi avec les seuils et la taille sélectionnés. Au départ : `conf=0.25`, `iou=0.5` et `imgsz=960`. Ultralytics adapte l'image à cette taille en conservant ses proportions et en ajoutant les bordures nécessaires.
 
 YOLO renvoie des coordonnées `(x1, y1, x2, y2)` et un score pour chaque boîte retenue. Le seuil de 0,25 élimine les détections moins confiantes. La suppression des doublons utilise l'IoU à 0,5 : elle évite de conserver plusieurs boîtes très superposées pour le même panneau. Ce réglage est distinct de l'IoU utilisé dans le notebook pour comparer une prédiction à une annotation lors de l'évaluation.
 
@@ -94,7 +107,7 @@ Pour chaque boîte, nous reprenons les opérations du notebook :
 5. Passer les zones ensemble dans le CNN, avec `training=False`.
 6. Prendre la catégorie ayant la plus grande probabilité Softmax parmi les 43 sorties.
 
-Il n'y a ni calcul de gradients, ni mise à jour des poids. Si YOLO ne trouve aucune boîte, le CNN n'est pas appelé. Les modèles sont chargés une seule fois au démarrage ; Python utilise CUDA si disponible, sinon MPS sur Mac compatible, sinon le CPU.
+Il n'y a ni calcul de gradients, ni mise à jour des poids. Si YOLO ne trouve aucune boîte, le CNN n'est pas appelé. La paire initiale est chargée au démarrage. Les autres modèles sont chargés à leur première utilisation, puis gardés en mémoire, jusqu'à quatre YOLO et huit CNN. Revenir à un modèle déjà chargé évite de relire ses poids. Python utilise CUDA si disponible, sinon MPS sur Mac compatible, sinon le CPU.
 
 ### 5. Afficher les résultats
 
@@ -107,19 +120,21 @@ Le plein écran porte sur le lecteur entier, pour conserver la vidéo et ses rec
 ## Lire les scores, la courbe et les images
 
 - **YOLO** : score associé à la localisation d'un panneau.
-- **CNN** : probabilité attribuée à la catégorie choisie. En dessous de 65 %, le texte devient « Catégorie incertaine » et le rectangle est orange. Au-dessus, la catégorie est affichée et le rectangle est vert. Ce seuil sert à l'affichage ; il ne supprime pas la détection et ne garantit pas qu'une catégorie est correcte.
+- **CNN** : probabilité attribuée à la catégorie choisie. En dessous du seuil d'affichage choisi (65 % au départ), le texte devient « Catégorie incertaine » et le rectangle est orange. Au-dessus, la catégorie est affichée et le rectangle est vert. Ce seuil sert à l'affichage ; il ne supprime pas la détection et ne garantit pas qu'une catégorie est correcte.
 - **ms** : temps entre le début de la préparation de l'image et la réception du résultat. Il comprend la copie, le JPEG, l'échange local et le calcul. Ce n'est pas uniquement le temps de YOLO.
 - **analyses/s** : fréquence des résultats récents acceptés par le lecteur, calculée sur les deux dernières secondes. Elle ne correspond pas à la fréquence de lecture de la vidéo.
 - **Panneaux par analyse** : nombre de boîtes retenues pour chacune des 30 dernières analyses affichées, positionnées selon leur instant dans la vidéo. La courbe repart après un déplacement ou un changement de réglage. Une baisse peut signifier qu'un panneau est sorti du champ ou que le modèle ne le retrouve plus ; elle ne mesure pas un apprentissage.
 - **Derniers panneaux repérés** : deux découpes provenant des images réellement envoyées à Python, avec leur instant et la catégorie proposée. Elles sont mises à jour au plus une fois par seconde quand des panneaux sont trouvés. Ces aperçus montrent la boîte YOLO sans la marge ajoutée pour le CNN. Ils restent visibles pour pouvoir examiner les dernières détections, même si le panneau n'est plus à l'écran.
 - **Historique** : les 40 dernières détections acceptées, avec leurs scores. Le même panneau peut y apparaître plusieurs fois. Ce n'est pas un comptage de panneaux distincts.
 
-L'historique et les aperçus sont conservés pendant les déplacements dans une même vidéo et sont vidés quand on change de vidéo. Ils restent en mémoire dans la page et disparaissent à son actualisation.
+L'historique et les aperçus sont conservés pendant les déplacements dans une même vidéo et sont vidés quand on change de vidéo ou qu'on applique une configuration. Ils restent en mémoire dans la page et disparaissent à son actualisation.
 
 ## Ce que les essais montrent
 
 | Essai | Observation et décision |
 |---|---|
+| Réglages dans le lecteur | Changement de modèles en pause, conservation après actualisation, annulation et retour aux réglages du projet vérifiés. La page tient sans défilement à 390 × 700 et 1 280 × 720. [Résultats](resultats/reglages_navigateur.json), [capture](resultats/reglages_lecteur.jpg). |
+| Choix des modèles et des paramètres | Les 20 couples disponibles ont été exécutés sur une vraie image. Les résultats avec des réglages modifiés correspondent à un appel direct des modèles. Retour vers des modèles déjà chargés, rejet des réglages invalides et lecture vidéo partielle vérifiés. [Test](verifier_reglages.py), [résultats](resultats/reglages_api.json). |
 | Python/OpenCV, 100 premières images de la séquence belge | 6 détections cumulées, environ 42 images/s pour YOLO + CNN seuls. [Prédictions](resultats/essai_640.csv). Ce débit de calcul ne suffisait pas à garantir la fluidité de l'interface. |
 | Premier lecteur Streamlit | Les tests des boutons et du calcul passaient, mais l'affichage réel sur une longue vidéo était lent et pouvait montrer une image cassée. Le rafraîchissement image par image n'était pas un bon lecteur vidéo. Le code est conservé dans [essai_streamlit.py](essai_streamlit.py), avec [son test](verifier_streamlit.py) et [ses anciens résultats](resultats/interface.json). |
 | Lecteur vidéo dans le navigateur | Ouverture directe du fichier H.264 de 269 Mo, 1 920 × 1 080 et 7 min 47 s, puis analyse réelle. Pendant une mesure, la vidéo avance de 15,17 s en 15,16 s réelles. Avance et retour de cinq secondes vérifiés en pause. [Mesures](resultats/lecteur_navigateur.json). |
@@ -181,3 +196,13 @@ Le CSV conserve les boîtes, les catégories et les scores pour chaque image tra
 | [BDD100K](https://bair.berkeley.edu/blog/2018/05/30/bdd/) | 100 000 vidéos de conduite aux États-Unis. Intéressant pour varier les scènes, mais les panneaux américains diffèrent de ceux appris par le CNN ; non utilisé ici. |
 
 L'[article BelgiumTS](https://btsd.ethz.ch/shareddata/publications/Timofte-MVA-2011-preprint.pdf), de Radu Timofte, Karel Zimmermann et Luc Van Gool, décrit des prises de vue espacées d'environ un mètre. Les 10 images/s de notre assemblage sont donc une cadence de lecture choisie, pas la vitesse d'origine de la voiture.
+
+### Choisir les modèles pour le flux H.264
+
+Le lecteur Python accepte aussi `--cnn`, `--yolo`, `--taille`, `--seuil` et `--iou`. Par exemple, pour reprendre les premiers essais :
+
+```bash
+python demo_video/demo.py demo_video/data/belgique_0000.mp4 --cnn cnn_3epoques.keras --yolo yolo_panneaux_5epoques.pt --taille 640 --seuil 0.25 --iou 0.5
+```
+
+Sans ces options, il prend les modèles retenus et les réglages de départ du projet.
